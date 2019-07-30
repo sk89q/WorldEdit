@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.BlockWorldVector;
 import com.sk89q.worldedit.LocalPlayer;
@@ -96,13 +97,15 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public void findFreePosition(WorldVector searchPos) {
         World world = searchPos.getWorld();
         int x = searchPos.getBlockX();
-        int y = Math.max(0, searchPos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), searchPos.getBlockY());
         int origY = y;
         int z = searchPos.getBlockZ();
 
+        int maxY = Math.min(world.getMaxY(), y + WorldEdit.getInstance().getConfiguration().defaultVerticalSize) + 2;
+
         byte free = 0;
 
-        while (y <= world.getMaxY() + 2) {
+        while (y <= maxY) {
             if (BlockType.canPassThrough(world.getBlock(new Vector(x, y, z)))) {
                 ++free;
             } else {
@@ -128,10 +131,11 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public void setOnGround(WorldVector searchPos) {
         World world = searchPos.getWorld();
         int x = searchPos.getBlockX();
-        int y = Math.max(0, searchPos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), searchPos.getBlockY());
         int z = searchPos.getBlockZ();
 
-        while (y >= 0) {
+        int minY = Math.max(getWorld().getMinY(), y - WorldEdit.getInstance().getConfiguration().defaultVerticalSize);
+        while (y >= minY) {
             final Vector pos = new Vector(x, y, z);
             final int id = world.getBlockType(pos);
             final int data = world.getBlockData(pos);
@@ -153,14 +157,16 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean ascendLevel() {
         final WorldVector pos = getBlockIn();
         final int x = pos.getBlockX();
-        int y = Math.max(0, pos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY());
         final int z = pos.getBlockZ();
         final World world = pos.getWorld();
 
-        byte free = 0;
-        byte spots = 0;
+        int free = 0;
+        int spots = 0;
 
-        while (y <= world.getMaxY() + 2) {
+        int maxY = Math.min(world.getMaxY(), y + WorldEdit.getInstance().getConfiguration().defaultVerticalSize) + 2;
+
+        while (y <= maxY) {
             if (BlockType.canPassThrough(world.getBlock(new Vector(x, y, z)))) {
                 ++free;
             } else {
@@ -194,13 +200,15 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean descendLevel() {
         final WorldVector pos = getBlockIn();
         final int x = pos.getBlockX();
-        int y = Math.max(0, pos.getBlockY() - 1);
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY() - 1);
         final int z = pos.getBlockZ();
         final World world = pos.getWorld();
 
         byte free = 0;
 
-        while (y >= 1) {
+        int minY = Math.max(getWorld().getMinY() + 1, y - WorldEdit.getInstance().getConfiguration().defaultVerticalSize);
+
+        while (y >= minY) {
             if (BlockType.canPassThrough(world.getBlock(new Vector(x, y, z)))) {
                 ++free;
             } else {
@@ -211,7 +219,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 // So we've found a spot, but we have to drop the player
                 // lightly and also check to see if there's something to
                 // stand upon
-                while (y >= 0) {
+                while (y >= minY) {
                     final Vector platform = new Vector(x, y, z);
                     final BaseBlock block = world.getBlock(platform);
                     final int type = block.getId();
@@ -244,8 +252,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
         Vector pos = getBlockIn();
         int x = pos.getBlockX();
-        int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 2);
+        int initialY = Math.max(getWorld().getMinY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY() + 2);
         int z = pos.getBlockZ();
         World world = getPosition().getWorld();
 
@@ -254,7 +262,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             return false;
         }
 
-        while (y <= world.getMaxY()) {
+        int maxY = Math.min(world.getMaxY(), y + WorldEdit.getInstance().getConfiguration().defaultVerticalSize);
+
+        while (y <= maxY) {
             // Found a ceiling!
             if (!BlockType.canPassThrough(world.getBlock(new Vector(x, y, z)))) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
@@ -277,8 +287,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean ascendUpwards(int distance, boolean alwaysGlass) {
         final Vector pos = getBlockIn();
         final int x = pos.getBlockX();
-        final int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 1);
+        final int initialY = Math.max(getWorld().getMinY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY() + 1);
         final int z = pos.getBlockZ();
         final int maxY = Math.min(getWorld().getMaxY() + 1, initialY + distance);
         final World world = getPosition().getWorld();
