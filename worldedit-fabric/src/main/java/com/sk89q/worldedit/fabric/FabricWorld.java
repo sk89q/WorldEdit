@@ -689,7 +689,7 @@ public class FabricWorld extends AbstractWorld {
         return new AbstractExtentMask(this) {
             @Override
             public boolean test(BlockVector3 vector) {
-                return getWorld().getBlockState(FabricAdapter.toBlockPos(vector)).getBlock() instanceof FluidBlock;
+                return FabricAdapter.adapt(getExtent().getBlock(vector)).getBlock() instanceof FluidBlock;
             }
 
             @Nullable

@@ -699,7 +699,7 @@ public class ForgeWorld extends AbstractWorld {
         return new AbstractExtentMask(this) {
             @Override
             public boolean test(BlockVector3 vector) {
-                return getWorld().getBlockState(ForgeAdapter.toBlockPos(vector)).getBlock() instanceof FlowingFluidBlock;
+                return ForgeAdapter.adapt(getExtent().getBlock(vector)).getBlock() instanceof FlowingFluidBlock;
             }
 
             @Nullable
