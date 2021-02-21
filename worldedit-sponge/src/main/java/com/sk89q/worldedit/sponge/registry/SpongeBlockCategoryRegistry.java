@@ -17,25 +17,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.sponge.adapter;
+package com.sk89q.worldedit.sponge.registry;
 
-/**
- * Thrown when no adapter can be found.
- */
-public class AdapterLoadException extends Exception {
+import com.google.common.collect.ImmutableSet;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.registry.BlockCategoryRegistry;
 
-    public AdapterLoadException() {
-    }
+import java.util.Set;
 
-    public AdapterLoadException(String message) {
-        super(message);
-    }
+public class SpongeBlockCategoryRegistry implements BlockCategoryRegistry {
 
-    public AdapterLoadException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AdapterLoadException(Throwable cause) {
-        super(cause);
+    @Override
+    public Set<BlockType> getCategorisedByName(String category) {
+        // TODO Sponge doesn't yet support tags
+        return ImmutableSet.of();
     }
 }
