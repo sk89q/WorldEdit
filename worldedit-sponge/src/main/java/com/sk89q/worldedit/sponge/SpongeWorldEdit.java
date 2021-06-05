@@ -43,7 +43,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import org.apache.logging.log4j.Logger;
-import org.bstats.sponge.Metrics;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
@@ -74,6 +73,7 @@ import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.biome.Biome;
 import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.jvm.Plugin;
@@ -108,7 +108,6 @@ public class SpongeWorldEdit {
     private final PluginContainer container;
     private final SpongeConfiguration config;
     private final Path workingDir;
-    private final Metrics metrics;
 
     private SpongePermissionsProvider provider;
     private SpongePlatform platform;
@@ -118,13 +117,11 @@ public class SpongeWorldEdit {
                            PluginContainer container,
                            SpongeConfiguration config,
                            @ConfigDir(sharedRoot = false)
-                               Path workingDir,
-                           Metrics.Factory metricsFactory) {
+                               Path workingDir) {
         this.logger = logger;
         this.container = container;
         this.config = config;
         this.workingDir = workingDir;
-        this.metrics = metricsFactory.make(BSTATS_PLUGIN_ID);
         inst = this;
     }
 
@@ -159,13 +156,13 @@ public class SpongeWorldEdit {
 
     @Listener
     public void serverStarted(StartedEngineEvent<Server> event) {
-        for (RegistryEntry<BlockType> blockType : event.engine().registries().registry(RegistryTypes.BLOCK_TYPE)) {
+        for (RegistryEntry<BlockType> blockType : event.game().registries().registry(RegistryTypes.BLOCK_TYPE)) {
             String id = blockType.key().asString();
             if (!com.sk89q.worldedit.world.block.BlockType.REGISTRY.keySet().contains(id)) {
                 com.sk89q.worldedit.world.block.BlockType.REGISTRY.register(id, new com.sk89q.worldedit.world.block.BlockType(
                     id,
                     input -> {
-                        BlockType spongeBlockType = Sponge.server().registries().registry(RegistryTypes.BLOCK_TYPE).value(
+                        BlockType spongeBlockType = Sponge.game().registries().registry(RegistryTypes.BLOCK_TYPE).value(
                             ResourceKey.resolve(input.getBlockType().getId())
                         );
                         return SpongeAdapter.adapt(spongeBlockType.defaultState());
@@ -174,24 +171,26 @@ public class SpongeWorldEdit {
             }
         }
 
-        for (RegistryEntry<ItemType> itemType : event.engine().registries().registry(RegistryTypes.ITEM_TYPE)) {
+        for (RegistryEntry<ItemType> itemType : event.game().registries().registry(RegistryTypes.ITEM_TYPE)) {
             String id = itemType.key().asString();
             if (!com.sk89q.worldedit.world.item.ItemType.REGISTRY.keySet().contains(id)) {
                 com.sk89q.worldedit.world.item.ItemType.REGISTRY.register(id, new com.sk89q.worldedit.world.item.ItemType(id));
             }
         }
 
-        for (RegistryEntry<EntityType<?>> entityType : event.engine().registries().registry(RegistryTypes.ENTITY_TYPE)) {
+        for (RegistryEntry<EntityType<?>> entityType : event.game().registries().registry(RegistryTypes.ENTITY_TYPE)) {
             String id = entityType.key().asString();
             if (!com.sk89q.worldedit.world.entity.EntityType.REGISTRY.keySet().contains(id)) {
                 com.sk89q.worldedit.world.entity.EntityType.REGISTRY.register(id, new com.sk89q.worldedit.world.entity.EntityType(id));
             }
         }
 
-        for (RegistryEntry<Biome> biomeType : event.engine().registries().registry(RegistryTypes.BIOME)) {
-            String id = biomeType.key().asString();
-            if (!BiomeType.REGISTRY.keySet().contains(id)) {
-                BiomeType.REGISTRY.register(id, new BiomeType(id));
+        for (ServerWorld world : event.engine().worldManager().worlds()) {
+            for (RegistryEntry<Biome> biomeType : world.registries().registry(RegistryTypes.BIOME)) {
+                String id = biomeType.key().asString();
+                if (!BiomeType.REGISTRY.keySet().contains(id)) {
+                    BiomeType.REGISTRY.register(id, new BiomeType(id));
+                }
             }
         }
 

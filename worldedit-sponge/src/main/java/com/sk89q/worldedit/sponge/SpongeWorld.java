@@ -361,7 +361,7 @@ public final class SpongeWorld extends AbstractWorld {
     public Entity createEntity(Location location, BaseEntity entity) {
         ServerWorld world = getWorld();
 
-        EntityType<?> entityType = Sponge.server().registries().registry(RegistryTypes.ENTITY_TYPE)
+        EntityType<?> entityType = Sponge.game().registries().registry(RegistryTypes.ENTITY_TYPE)
             .value(ResourceKey.resolve(entity.getType().getId()));
         Vector3d pos = new Vector3d(location.getX(), location.getY(), location.getZ());
 
@@ -401,7 +401,7 @@ public final class SpongeWorld extends AbstractWorld {
     @Override
     public void setWeather(WeatherType weatherType) {
         getWorld().setWeather(
-            Sponge.server().registries().registry(RegistryTypes.WEATHER_TYPE).value(
+            Sponge.game().registries().registry(RegistryTypes.WEATHER_TYPE).value(
                 ResourceKey.resolve(weatherType.getId())
             )
         );
@@ -410,7 +410,7 @@ public final class SpongeWorld extends AbstractWorld {
     @Override
     public void setWeather(WeatherType weatherType, long duration) {
         getWorld().setWeather(
-            Sponge.server().registries().registry(RegistryTypes.WEATHER_TYPE).value(
+            Sponge.game().registries().registry(RegistryTypes.WEATHER_TYPE).value(
                 ResourceKey.resolve(weatherType.getId())
             ),
             Ticks.of(duration)

@@ -45,11 +45,8 @@ dependencies {
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:sponge"))
     api("org.spongepowered:spongeapi:8.0.0-SNAPSHOT")
-    implementation(enforcedPlatform("org.apache.logging.log4j:log4j-bom:2.8.1") {
-        because("Sponge 8 provides Log4J at 2.8.1")
-    })
-    api("org.apache.logging.log4j:log4j-api")
-    api("org.bstats:bstats-sponge:2.2.1")
+    // bStats isn't updated yet :(
+    // api("org.bstats:bstats-sponge:2.2.1")
     testImplementation("org.mockito:mockito-core:${Versions.MOCKITO}")
 }
 
