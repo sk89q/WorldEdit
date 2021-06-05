@@ -27,19 +27,12 @@ configurations {
 }
 
 dependencies {
-    constraints {
-        "implementation"( "org.yaml:snakeyaml") {
-            version { strictly("1.26") }
-            because("Bukkit provides SnakeYaml")
-        }
-    }
-
     "api"(project(":worldedit-libs:core"))
     "implementation"("de.schlichtherle:truezip:6.8.4")
     "implementation"("org.mozilla:rhino-runtime:1.7.13")
-    "implementation"("org.yaml:snakeyaml")
+    "implementation"("org.yaml:snakeyaml:1.26")
     "implementation"("com.google.guava:guava")
-    "implementation"("com.google.code.findbugs:jsr305:1.3.9")
+    "compileOnlyApi"("com.google.code.findbugs:jsr305:1.3.9")
     "implementation"("com.google.code.gson:gson")
 
     "implementation"("org.apache.logging.log4j:log4j-api:2.8.1") {

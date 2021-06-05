@@ -39,7 +39,7 @@ dependencies {
     "compileOnly"("com.sk89q:dummypermscompat:1.10")
     "implementation"("org.bstats:bstats-bukkit:2.1.0")
     "implementation"("it.unimi.dsi:fastutil")
-    "testImplementation"("org.mockito:mockito-core:1.9.0-rc1")
+    "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
 }
 
 tasks.named<Copy>("processResources") {
